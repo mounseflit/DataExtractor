@@ -107,6 +107,11 @@ def call_llm_api(article_text, format, Example):
         raise Exception(f"Failed to call the LLM API: {response.status_code}")
     result = response.json()
 
+    # Parse the API response
+    if isinstance(result, dict) and 'response' in result:
+        # The API returned a dictionary with a 'response' key
+        result = result['response']
+
     return result
 
 
