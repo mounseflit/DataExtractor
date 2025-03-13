@@ -7,7 +7,6 @@ import urllib.parse
 import os
 import shutil
 import PyPDF2
-import docx
 import pandas as pd
 
 
@@ -55,14 +54,6 @@ def extract_text_from_document(doc_path):
                 return text
             except Exception as e:
                 return f"Error extracting PDF text: {str(e)}"
-        
-        # Word documents
-        elif file_ext in ['.docx', '.doc']:
-            try:
-                doc = docx.Document(doc_path)
-                return "\n".join([para.text for para in doc.paragraphs])
-            except Exception as e:
-                return f"Error extracting Word document text: {str(e)}"
         
         # Excel files
         elif file_ext in ['.xlsx', '.xls']:
