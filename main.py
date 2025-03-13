@@ -5,10 +5,9 @@ import re
 import json
 import urllib.parse
 import os
-import shutil
 import PyPDF2
 import pandas as pd
-
+import docx2txt
 
 
 def scrape_text_from_url(url):
@@ -62,6 +61,22 @@ def extract_text_from_document(doc_path):
                 return df.to_string()
             except Exception as e:
                 return f"Error extracting Excel text: {str(e)}"
+            
+        # DOCX files
+        elif file_ext == '.docx':
+            try:
+                text = docx2txt.process(doc_path)
+                return text
+            except Exception as e:
+                return f"Error extracting DOCX text: {str(e)}"
+            
+        # PPTX files
+        elif file_ext == '.pptx':
+            try:
+                text = docx2txt.process(doc_path)
+                return text
+            except Exception as e:
+                return f"Error extracting PPTX text: {str(e)}"
         
         # CSV files
         elif file_ext == '.csv':
@@ -73,6 +88,8 @@ def extract_text_from_document(doc_path):
         
         else:
             return f"Unsupported file format: {file_ext}"
+        
+        
 
 
 def call_llm_api(article_text, format, Example):
@@ -343,6 +360,15 @@ def main():
         
         with tabs[1]:
             st.markdown("<h2 class='subheader'>À Propos de cet Outil</h2>", unsafe_allow_html=True)
+            st.markdown("""
+                <div style="padding: 20px; border-radius: 10px; background-color: #f0f7ff;">
+                    <h3>Développé par AI Crafters ✨ pour Attijari Wafa Bank</h3>
+                    <p>Cet outil d'extraction et de formatage automatique de données est conçu pour simplifier 
+                    le traitement des informations provenant de diverses sources.</p>
+                    <p>Il permet d'extraire des données structurées à partir de pages web, documents PDF, 
+                    ou texte brut, puis de les normaliser dans le format de votre choix.</p>
+                </div>
+            """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
