@@ -6,3 +6,4 @@ Pillow
 docx
 PyPDF2
 pandas
+docx2txt
