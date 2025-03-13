@@ -361,7 +361,7 @@ def main():
         with tabs[1]:
             st.markdown("<h2 class='subheader'>À Propos de cet Outil</h2>", unsafe_allow_html=True)
             st.markdown("""
-                <div style="padding: 20px; border-radius: 10px; background-color: #f0f7ff;">
+                <div style="padding: 20px; border-radius: 10px;">
                     <h3>Développé par AI Crafters ✨ pour Attijari Wafa Bank</h3>
                     <p>Cet outil d'extraction et de formatage automatique de données est conçu pour simplifier 
                     le traitement des informations provenant de diverses sources.</p>
