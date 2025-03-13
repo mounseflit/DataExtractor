@@ -293,6 +293,26 @@ def main():
                             try:
                                 article_text = scrape_text_from_url(url)
                                 st.success("Extraction réussie!")
+                                with st.spinner(f"Formatage des données en {format}..."):
+                                    try:
+                                        result = call_llm_api(article_text, format, example_output)
+                                        result = fix_unicode(str(result))
+                                        
+                                        st.markdown("<h2 class='subheader'>Résultats</h2>", unsafe_allow_html=True)
+                                        st.code(result)
+                                        
+                                        # Add download button
+                                        file_name = f"data_formatted.{format if format not in ['bulletpoints', 'paragraphes', 'résumé'] else 'txt'}"
+                                        st.download_button(
+                                            label="Télécharger les résultats",
+                                            data=result,
+                                            file_name=file_name,
+                                            mime="text/plain",
+                                            use_container_width=True
+                                        )
+                                    except Exception as e:
+                                        st.error(f"Erreur lors du formatage: {str(e)}")
+
                             except Exception as e:
                                 st.error(f"Erreur lors de l'extraction: {str(e)}")
                     else:
