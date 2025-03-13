@@ -1,0 +1,8 @@
+streamlit
+requests
+bs4
+fal-client
+Pillow
+docx
+PyPDF2
+pandas
