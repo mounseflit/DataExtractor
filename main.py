@@ -8,6 +8,7 @@ import os
 import PyPDF2
 import pandas as pd
 import docx2txt
+import zipfile
 
 
 def scrape_text_from_url(url):
@@ -70,10 +71,20 @@ def extract_text_from_document(doc_path):
             except Exception as e:
                 return f"Error extracting DOCX text: {str(e)}"
             
-        # PPTX files
+         # PPTX files
         elif file_ext == '.pptx':
             try:
-                text = docx2txt.process(doc_path)
+                text = ""
+                # PPTX files are actually zip archives with XML content
+                with zipfile.ZipFile(doc_path) as zf:
+                    # Extract text from slide XML files
+                    for filename in zf.namelist():
+                        if filename.startswith('ppt/slides/slide') and filename.endswith('.xml'):
+                            content = zf.read(filename).decode('utf-8')
+                            # Extract text content using regex
+                            text_matches = re.findall(r'<a:t>([^<]*)</a:t>', content)
+                            slide_text = ' '.join(text_matches)
+                            text += slide_text + "\n"
                 return text
             except Exception as e:
                 return f"Error extracting PPTX text: {str(e)}"
