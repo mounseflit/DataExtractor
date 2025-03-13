@@ -300,45 +300,7 @@ def main():
             
             elif input_method == "Texte manuel":
                 article_text = st.text_area("Entrez ou collez votre texte ici", height=300)
-            
-            elif input_method == "Fichier local":
-                uploaded_file = st.file_uploader("Choisissez un fichier", type=['pdf', 'docx', 'txt', 'xlsx', 'csv', 'pptx'])
-                if uploaded_file is not None:
-                    with st.spinner("Lecture du fichier..."):
-                        # Save uploaded file temporarily
-                        temp_file_path = os.path.join(os.getcwd(), uploaded_file.name)
-                        with open(temp_file_path, 'wb') as f:
-                            f.write(uploaded_file.getbuffer())
-                        
-                        article_text = extract_text_from_document(temp_file_path)
-                        
-                        # Clean up
-                        if os.path.exists(temp_file_path):
-                            os.remove(temp_file_path)
-                        
-                        st.success("Fichier chargé avec succès!")
-            
-            elif input_method == "Document PDF en ligne":
-                pdf_url = st.text_input("Entrez l'URL du PDF", placeholder="https://exemple.com/document.pdf")
-                if st.button("Extraire le contenu du PDF", type="primary"):
-                    if pdf_url:
-                        with st.spinner("Extraction du PDF en cours..."):
-                            try:
-                                article_text = scrap_pdf_from_url(pdf_url)
-                                st.success("PDF extrait avec succès!")
-                            except Exception as e:
-                                st.error(f"Erreur lors de l'extraction du PDF: {str(e)}")
-                    else:
-                        st.warning("Veuillez entrer une URL de PDF valide")
-            
-            # Preview section
-            if article_text and len(article_text) > 20:
-                with st.expander("Aperçu du texte extrait"):
-                    st.text(article_text[:1000] + ("..." if len(article_text) > 1000 else ""))
-                    
-                # Process button
-                if st.button("Formater les données", type="primary", use_container_width=True):
-                    with st.spinner(f"Formatage des données en {format}..."):
+                with st.spinner(f"Formatage des données en {format}..."):
                         try:
                             result = call_llm_api(article_text, format, example_output)
                             result = fix_unicode(str(result))
@@ -357,6 +319,79 @@ def main():
                             )
                         except Exception as e:
                             st.error(f"Erreur lors du formatage: {str(e)}")
+            
+            elif input_method == "Fichier local":
+                uploaded_file = st.file_uploader("Choisissez un fichier", type=['pdf', 'docx', 'txt', 'xlsx', 'csv', 'pptx'])
+                if uploaded_file is not None:
+                    with st.spinner("Lecture du fichier..."):
+                        # Save uploaded file temporarily
+                        temp_file_path = os.path.join(os.getcwd(), uploaded_file.name)
+                        with open(temp_file_path, 'wb') as f:
+                            f.write(uploaded_file.getbuffer())
+                        
+                        article_text = extract_text_from_document(temp_file_path)
+                        
+                        # Clean up
+                        if os.path.exists(temp_file_path):
+                            os.remove(temp_file_path)
+                        
+                        st.success("Fichier chargé avec succès!")
+
+                        with st.spinner(f"Formatage des données en {format}..."):
+                            try:
+                                result = call_llm_api(article_text, format, example_output)
+                                result = fix_unicode(str(result))
+                                
+                                st.markdown("<h2 class='subheader'>Résultats</h2>", unsafe_allow_html=True)
+                                st.code(result)
+                                
+                                # Add download button
+                                file_name = f"data_formatted.{format if format not in ['bulletpoints', 'paragraphes', 'résumé'] else 'txt'}"
+                                st.download_button(
+                                    label="Télécharger les résultats",
+                                    data=result,
+                                    file_name=file_name,
+                                    mime="text/plain",
+                                    use_container_width=True
+                                )
+                            except Exception as e:
+                                st.error(f"Erreur lors du formatage: {str(e)}")
+            
+            elif input_method == "Document PDF en ligne":
+                pdf_url = st.text_input("Entrez l'URL du PDF", placeholder="https://exemple.com/document.pdf")
+                if st.button("Extraire le contenu du PDF", type="primary"):
+                    if pdf_url:
+                        with st.spinner("Extraction du PDF en cours..."):
+                            try:
+                                article_text = scrap_pdf_from_url(pdf_url)
+                                st.success("PDF extrait avec succès!")
+
+                                with st.spinner(f"Formatage des données en {format}..."):
+                                    try:
+                                        result = call_llm_api(article_text, format, example_output)
+                                        result = fix_unicode(str(result))
+                                        
+                                        st.markdown("<h2 class='subheader'>Résultats</h2>", unsafe_allow_html=True)
+                                        st.code(result)
+                                        
+                                        # Add download button
+                                        file_name = f"data_formatted.{format if format not in ['bulletpoints', 'paragraphes', 'résumé'] else 'txt'}"
+                                        st.download_button(
+                                            label="Télécharger les résultats",
+                                            data=result,
+                                            file_name=file_name,
+                                            mime="text/plain",
+                                            use_container_width=True
+                                        )
+                                    except Exception as e:
+                                        st.error(f"Erreur lors du formatage: {str(e)}")
+                            except Exception as e:
+                                st.error(f"Erreur lors de l'extraction du PDF: {str(e)}")
+                    else:
+                        st.warning("Veuillez entrer une URL de PDF valide")
+            
+            
+                   
         
         with tabs[1]:
             st.markdown("<h2 class='subheader'>À Propos de cet Outil</h2>", unsafe_allow_html=True)
